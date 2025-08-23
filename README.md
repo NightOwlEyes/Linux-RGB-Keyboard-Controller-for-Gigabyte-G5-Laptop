@@ -15,8 +15,6 @@ sudo dnf install kernel-devel-$(uname -r)
 
 >2. Download source code from clevo-keyboard<br>
 ```
-sudo dkms remove tuxedo-keyboard/3.2.10 --all
-sudo rm -rf /usr/src/tuxedo-keyboard-3.2.10
 rm -rf ~/clevo-keyboard
 cd ~
 git clone https://github.com/wessel-novacustom/clevo-keyboard.git
