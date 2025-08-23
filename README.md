@@ -23,16 +23,16 @@ git clone https://github.com/wessel-novacustom/clevo-keyboard.git
 ```
 
 >3. Require DKMS build and module installation
-
+```
+sudo cp -R ~/clevo-keyboard /usr/src/tuxedo-keyboard-3.2.10
+sudo dkms install -m tuxedo-keyboard -v 3.2.10
+```
 >[!NOTE]
 >You will see few lines after running the command, don't worry and do the next steps.<br>
 ><sub>Executing post-transaction command.............(bad exit status: 1)</sub><br>
 ><sub>Failed command:</sub><br>
 ><sub>dracut --regenerate-all --force</sub>
-```
-sudo cp -R ~/clevo-keyboard /usr/src/tuxedo-keyboard-3.2.10
-sudo dkms install -m tuxedo-keyboard -v 3.2.10
-```
+
 >4. After installation, load the module, if nothing appears when running the command, it means the load was successful.<br>
 ```
 sudo modprobe tuxedo_keyboard
