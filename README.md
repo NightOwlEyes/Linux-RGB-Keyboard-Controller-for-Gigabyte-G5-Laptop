@@ -77,16 +77,20 @@ sudo systemctl daemon-reload
 ```
 
 ## Now you can use the Key Combination<br>
-  `Fn` + `/` (num lock) to change the basic keyboard RGB color<br>
-  `Fn` + `*` (num lock) to turn on/off the keyboard light<br>
-  `Fn` + `-` (num lock) to turn on/off the keyboard brightness<br>
-  `Fn` + `+` (num lock) to turn on/off the keyboard brightness<br>
+  `Fn` + `/` (num lock) to change the basic keyboard RGB color.<br>
+  `Fn` + `*` (num lock) to turn on/off the keyboard light.<br>
+  `Fn` + `-` (num lock) to turn on/off the keyboard brightness.<br>
+  `Fn` + `+` (num lock) to turn on/off the keyboard brightness.<br>
   
 ## Or you can also<br>
 Usage: `sudo led` <command> [parameters]<br>
 Command:<br>
-  `on` | `off`               Turn on/off the light.<br>
-  `bright` <0-255>          Set custom brightness.<br>
-  `rgb` <r> <g> <b>         Custom RGB color mixing.<br>
-  `save`                    (System) Save current state.<br>
-  `restore`                 (System) Restore saved state
+  `on` | `off`  Turn on/off the light.<br>
+  `bright` <0-255>  Set custom brightness.<br>
+  `rgb` <r> <g> <b>  Custom RGB color mixing.<br>
+  `save`  (System) Save current state.<br>
+  `restore`  (System) Restore saved state.<br>
+For example:<br>
+`sudo led rgb 128 128 225`<br>
+`sudo led bright 50`<br>
+`sudo led off`<br>
