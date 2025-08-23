@@ -71,26 +71,32 @@ sudo systemctl enable kbd-backlight-color.service
 sudo systemctl enable kbd-backlight-autosave.timer
 ```
 
->10. Reload systemd configuration: After modifying a service file, you should always run this command so that the system is aware of the change.<br>
+>10. Reload systemd configuration: After modifying a service file, you should always run this command so that the system is aware of the change and restart the device.<br>
 ```
 sudo systemctl daemon-reload
+sudo reboot now
 ```
 
-## Now you can use the Key Combination<br>
+## Now you can use the Key Combination
   `Fn` + `/` (num lock) to change the basic keyboard RGB color.<br>
   `Fn` + `*` (num lock) to turn on/off the keyboard light.<br>
-  `Fn` + `-` (num lock) to turn on/off the keyboard brightness.<br>
-  `Fn` + `+` (num lock) to turn on/off the keyboard brightness.<br>
-  
-## Or you can also<br>
-Usage: `sudo led` <command> [parameters]<br>
-Command:<br>
-  `on` | `off`  Turn on/off the light.<br>
-  `bright` <0-255>  Set custom brightness.<br>
-  `rgb` <r> <g> <b>  Custom RGB color mixing.<br>
-  `save`  (System) Save current state.<br>
-  `restore`  (System) Restore saved state.<br>
-For example:<br>
-`sudo led rgb 128 128 225`<br>
-`sudo led bright 50`<br>
-`sudo led off`<br>
+  `Fn` + `-` (num lock) to decrease the keyboard brightness.<br>
+  `Fn` + `+` (num lock) to increase the keyboard brightness.<br>
+
+## Or you can also
+```bash
+Usage: sudo led <command> [parameters]
+
+Command:
+  on | off          Turn on/off the light.
+  bright <0-255>    Set custom brightness.
+  rgb <r> <g> <b>   Custom RGB color mixing.
+  save              (System) Save current state.
+  restore           (System) Restore saved state.
+  help
+
+For example:
+  sudo led rgb 128 128 225
+  sudo led bright 50
+  sudo led off
+```
