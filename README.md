@@ -7,20 +7,23 @@
 >[!IMPORTANT]
 >**Make sure "Secure Boot Status = Disabled" by restarting the computer and continuously pressing F2 to enter BIOS. In BIOS select "Admin Secure Boot", set all values ​​to "Disabled" and save.**
 
->1. Install the kernel-devel package for your current kernel</br>
+>### 1. Install the kernel-devel package for your current kernel</br>
 Depending on the linux system, there will be different installation commands: `sudo apt`, `sudo dnf`,...<br>
 ```
 sudo dnf install kernel-devel-$(uname -r)
 ```
 
->2. Download source code from clevo-keyboard<br>
+>### 2. Download source code from clevo-keyboard<br>
 ```
 rm -rf ~/clevo-keyboard
 cd ~
 git clone https://github.com/wessel-novacustom/clevo-keyboard.git
 ```
 
->3. Require DKMS build and module installation
+>### 3. Require DKMS build and module installation<br>
+
+> [!TIP]
+>Open File Manager press `Ctrl` + `L` then type `~` in the search bar press `Enter` to determine the downloaded version
 ```
 sudo cp -R ~/clevo-keyboard /usr/src/tuxedo-keyboard-3.2.10
 sudo dkms install -m tuxedo-keyboard -v 3.2.10
@@ -31,19 +34,19 @@ sudo dkms install -m tuxedo-keyboard -v 3.2.10
 ><sub>Failed command:</sub><br>
 ><sub>dracut --regenerate-all --force</sub>
 
->4. After installation, load the module, if nothing appears when running the command, it means the load was successful.<br>
+>### 4. After installation, load the module, if nothing appears when running the command, it means the load was successful.<br>
 ```
 sudo modprobe tuxedo_keyboard
 ```
 
->5. Then check it immediately with the command.<br>
+>### 5. Then check it immediately with the command.<br>
 If you see `rgb:kbd_backlight` appear, it means the installation was successful.
 ```
 ls /sys/class/leds/
 echo 255 | sudo tee /sys/class/leds/rgb:kbd_backlight/brightness
 ```
 
->6. Download this archive
+>### 6. Download this archive
 ```
 cd ~
 git clone https://github.com/NightOwlEyes/Linux-RGB-Keyboard-Controller-for-Gigabyte-G5-Laptop.git
@@ -53,23 +56,23 @@ sudo cp kbd-backlight-* /etc/systemd/system/
 echo tuxedo_keyboard | sudo tee /etc/modules-load.d/tuxedo.conf
 ```
 
->7. Give the script executable permissions<br>
+>### 7. Give the script executable permissions<br>
 ```
 sudo chmod +x /usr/local/bin/led
 ```
 
->8. Label it safe so SELinux doesn't block the script<br>
+>### 8. Label it safe so SELinux doesn't block the script<br>
 ```
 sudo chcon -t bin_t /usr/local/bin/led
 ```
 
->9. Tell the system to "Remember to run this service at startup".<br>
+>### 9. Tell the system to "Remember to run this service at startup".<br>
 ```
 sudo systemctl enable kbd-backlight-color.service
 sudo systemctl enable kbd-backlight-autosave.timer
 ```
 
->10. Reload systemd configuration: After modifying a service file, you should always run this command so that the system is aware of the change and restart the device.<br>
+>### 10. Reload systemd configuration: After modifying a service file, you should always run this command so that the system is aware of the change and restart the device.<br>
 ```
 sudo systemctl daemon-reload
 sudo reboot now
