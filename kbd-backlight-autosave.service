@@ -1,0 +1,6 @@
+[Unit]
+Description=Periodically save keyboard backlight state
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/led save

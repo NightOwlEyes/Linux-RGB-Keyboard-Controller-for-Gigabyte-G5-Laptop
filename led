@@ -1,0 +1,98 @@
+#!/bin/bash
+
+# --- Cấu hình ---
+BRIGHT_FILE="/sys/class/leds/rgb:kbd_backlight/brightness"
+COLOR_FILE="/sys/class/leds/rgb:kbd_backlight/multi_intensity"
+CONF_FILE="/etc/kbd_backlight.conf" # Tệp để lưu trạng thái
+
+# --- Chức năng ---
+save_state() {
+    echo "LAST_COLOR=\"$1\"" > "$CONF_FILE"
+    echo "LAST_BRIGHTNESS=\"$2\"" >> "$CONF_FILE"
+}
+
+usage() {
+    echo "Công cụ điều khiển và lưu/phục hồi trạng thái đèn nền."
+    echo ""
+    echo "Cách dùng: sudo led <lệnh> [tham số]"
+    echo ""
+    echo "Lệnh:"
+    echo "  on | off                Bật/tắt đèn."
+    echo "  bright <0-255>          Đặt độ sáng tùy chỉnh."
+    echo "  rgb <r> <g> <b>         Pha màu RGB tùy chỉnh."
+    echo "  save                    (Hệ thống) Lưu trạng thái hiện tại."
+    echo "  restore                 (Hệ thống) Phục hồi trạng thái đã lưu."
+    echo ""
+    echo "Màu có sẵn: red, green, blue, white, purple, cyan, yellow"
+    exit 1
+}
+
+# --- Kịch bản chính ---
+if [[ $EUID -ne 0 ]]; then
+   echo "Lỗi: Vui lòng chạy kịch bản này với quyền root (sử dụng sudo)."
+   exit 1
+fi
+if [ -z "$1" ]; then usage; fi
+
+COMMAND="$1"
+case "$COMMAND" in
+    save)
+        CURRENT_COLOR=$(cat "$COLOR_FILE")
+        CURRENT_BRIGHTNESS=$(cat "$BRIGHT_FILE")
+        save_state "$CURRENT_COLOR" "$CURRENT_BRIGHTNESS"
+        # Lệnh này chạy khi tắt máy nên không cần thông báo
+        ;;
+    restore)
+        if [ -f "$CONF_FILE" ]; then
+            source "$CONF_FILE"
+            echo "$LAST_COLOR" > "$COLOR_FILE"
+            echo "$LAST_BRIGHTNESS" > "$BRIGHT_FILE"
+        fi
+        ;;
+    off)
+        echo 0 > "$BRIGHT_FILE"
+        save_state "$(cat $COLOR_FILE)" "0"
+        echo "Đã tắt đèn bàn phím và lưu trạng thái."
+        ;;
+    on)
+        echo 255 > "$BRIGHT_FILE"
+        save_state "$(cat $COLOR_FILE)" "255"
+        echo "Đã bật đèn bàn phím và lưu trạng thái."
+        ;;
+    red|green|blue|white|purple|cyan|yellow)
+        case "$COMMAND" in
+            red)    COLOR_VALUE="255 0 0" ;;
+            green)  COLOR_VALUE="0 255 0" ;;
+            blue)   COLOR_VALUE="0 0 255" ;;
+            white)  COLOR_VALUE="255 255 255" ;;
+            purple) COLOR_VALUE="255 0 255" ;;
+            cyan)   COLOR_VALUE="0 255 255" ;;
+            yellow) COLOR_VALUE="255 255 0" ;;
+        esac
+        echo "$COLOR_VALUE" > "$COLOR_FILE" && echo 255 > "$BRIGHT_FILE"
+        save_state "$COLOR_VALUE" "255"
+        echo "Đã đổi màu thành $COMMAND và lưu trạng thái."
+        ;;
+    bright)
+        VALUE="$2"
+        if ! [[ "$VALUE" =~ ^[0-9]+$ ]] || [ "$VALUE" -lt 0 ] || [ "$VALUE" -gt 255 ]; then exit 1; fi
+        echo "$VALUE" > "$BRIGHT_FILE"
+        save_state "$(cat $COLOR_FILE)" "$VALUE"
+        echo "Đã đặt độ sáng thành $VALUE và lưu trạng thái."
+        ;;
+    rgb)
+        R="$2"; G="$3"; B="$4"
+        if [ -z "$R" ] || [ -z "$G" ] || [ -z "$B" ]; then usage; fi
+        for val in $R $G $B; do
+            if ! [[ "$val" =~ ^[0-9]+$ ]] || [ "$val" -lt 0 ] || [ "$val" -gt 255 ]; then exit 1; fi
+        done
+        COLOR_VALUE="$R $G $B"
+        echo "$COLOR_VALUE" > "$COLOR_FILE" && echo 255 > "$BRIGHT_FILE"
+        save_state "$COLOR_VALUE" "255"
+        echo "Đã đặt màu RGB thành ($COLOR_VALUE) và lưu trạng thái."
+        ;;
+    *)
+        usage
+        ;;
+esac
+exit 0

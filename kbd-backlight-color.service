@@ -1,0 +1,11 @@
+[Unit]
+Description=Restore keyboard backlight color on boot
+After=systemd-modules-load.service multi-user.target
+Requires=sys-devices-platform-tuxedo_keyboard.device
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c "sleep 1 && /usr/local/bin/led restore"
+
+[Install]
+WantedBy=multi-user.target

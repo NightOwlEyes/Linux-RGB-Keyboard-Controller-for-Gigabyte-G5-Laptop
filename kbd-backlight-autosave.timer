@@ -1,0 +1,9 @@
+[Unit]
+Description=Run kbd-backlight-autosave.service every 15 seconds
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=15s
+
+[Install]
+WantedBy=timers.target
