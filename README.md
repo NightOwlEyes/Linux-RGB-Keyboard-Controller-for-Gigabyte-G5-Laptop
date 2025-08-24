@@ -50,7 +50,7 @@ echo 255 | sudo tee /sys/class/leds/rgb:kbd_backlight/brightness
 ```
 cd ~
 git clone https://github.com/NightOwlEyes/Linux-RGB-Keyboard-Controller-for-Gigabyte-G5-Laptop.git
-cd ~/"-Linux-RGB-Keyboard-Driver-on-Gigabyte-G5-Laptop"
+cd ~/"Linux-RGB-Keyboard-Controller-for-Gigabyte-G5-Laptop"
 sudo cp led /usr/local/bin/
 sudo cp kbd-backlight-* /etc/systemd/system/
 echo tuxedo_keyboard | sudo tee /etc/modules-load.d/tuxedo.conf
