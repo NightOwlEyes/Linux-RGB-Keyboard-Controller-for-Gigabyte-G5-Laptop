@@ -1,90 +1,108 @@
 # Linux-RGB-Keyboard-Controller-for-Gigabyte-G5-Laptop
-**Linux on Gigabyte Laptops has few drivers that support LED activation for keyboard. And if there is support, their GUI driver has been removed from the repositories. So I created a "program" based on "Tuxedo-keyboard" to communicate with the keyboard and you can control the LED using Terminal and shortcut keys.**
+**LLinux on Gigabyte Laptops has few drivers that support LED activation for the keyboard. This project provides a complete solution based on the "tuxedo-keyboard" driver, allowing you to control your keyboard's RGB backlight via Terminal and native Fn keys.**
 
 >[!CAUTION]
->**This entire guide was performed on Fedora Linux 42 (kernel 6.14.0-63. fc42.x86_64) (Workstation Edition) other operating systems may not work. Tested on Kernel 6.15.10-200. fc42.x86_64 is not compatible.**
+>**This guide was performed on Fedora Linux 42 (kernel 6.14.0-63.fc42.x86_64). Compatibility with the latest kernels (e.g., 6.15.x+) is not guaranteed. Other Linux distributions may require different package names.**
 
 >[!IMPORTANT]
->**Make sure "Secure Boot Status = Disabled" by restarting the computer and continuously pressing F2 to enter BIOS. In BIOS select "Admin Secure Boot", set all values ​​to "Disabled" and save.**
+>**Secure Boot must be disabled.** Restart your computer and press `F2` to enter BIOS. Navigate to "Administer Secure Boot" and ensure "Secure Boot Status" is **Disabled**
+
+## Prerequisites
+Before starting, make sure you have installed all the necessary tools for building kernel modules.<br>
+Depending on the linux system, there will be different installation commands: `sudo apt`, `sudo dnf`,...<br>
+```
+sudo dnf install git dkms make gcc kernel-devel
+```
 
 ### 1. Install the kernel-devel package for your current kernel</br>
-Depending on the linux system, there will be different installation commands: `sudo apt`, `sudo dnf`,...<br>
+This ensures the driver can be built for the exact kernel version you are running.
 ```
 sudo dnf install kernel-devel-$(uname -r)
 ```
 
-### 2. Download source code from clevo-keyboard<br>
+### 2. Download and Install the DKMS Driver<br>
+This will download the `clevo-keyboard` driver source and use DKMS to install it. DKMS ensures the driver is automatically rebuilt after kernel updates.
 ```
+# Clean up any previous attempts
 rm -rf ~/clevo-keyboard
+
+# Clone the repository
 cd ~
 git clone https://github.com/wessel-novacustom/clevo-keyboard.git
-```
 
-### 3. Require DKMS build and module installation<br>
-
-> [!TIP]
->Open File Manager press `Ctrl` + `L` then type `~` in the search bar press `Enter` to determine the downloaded version
-```
-sudo cp -R ~/clevo-keyboard /usr/src/tuxedo-keyboard-3.2.10
-sudo dkms install -m tuxedo-keyboard -v 3.2.10
+# Automatically get driver version and install via DKMS
+DRIVER_VERSION=$(grep "PACKAGE_VERSION" ~/clevo-keyboard/dkms.conf | cut -d'=' -f2 | tr -d '"')
+sudo cp -R ~/clevo-keyboard /usr/src/tuxedo-keyboard-${DRIVER_VERSION}
+sudo dkms install -m tuxedo-keyboard -v ${DRIVER_VERSION}
 ```
 >[!NOTE]
 >You will see few lines after running the command, don't worry and do the next steps.<br>
-><sub>Executing post-transaction command.............(bad exit status: 1)</sub><br>
-><sub>Failed command:</sub><br>
-><sub>dracut --regenerate-all --force</sub>
+><sub>Executing post-transaction command.............(bad exit status: 1)<br>
+>Failed command:<br>
+>dracut --regenerate-all --force</sub>
 
-### 4. After installation, load the module, if nothing appears when running the command, it means the load was successful.<br>
+### 3. Load and Verify the Driver<br>
+Load the module into the kernel and check if the control interface was created.
 ```
+# Load the module
 sudo modprobe tuxedo_keyboard
-```
 
-### 5. Then check it immediately with the command.<br>
-If you see `rgb:kbd_backlight` appear, it means the installation was successful.
-```
+# Check if the control directory exists
 ls /sys/class/leds/
+```
+If you see rgb:kbd_backlight in the output, the driver is working! You can test it by running:
+```
 echo 255 | sudo tee /sys/class/leds/rgb:kbd_backlight/brightness
 ```
 
-### 6. Download this archive
+### 4. Install the Control Scripts and Systemd Services
+This will download this repository and place the `led` script and systemd services in the correct system directories.
 ```
+rm -rf ~/Linux-RGB-Keyboard-Controller-for-Gigabyte-G5-Laptop
 cd ~
-git clone https://github.com/NightOwlEyes/Linux-RGB-Keyboard-Controller-for-Gigabyte-G5-Laptop.git
-cd ~/"Linux-RGB-Keyboard-Controller-for-Gigabyte-G5-Laptop"
-sudo cp led /usr/local/bin/
-sudo cp kbd-backlight-* /etc/systemd/system/
+git clone https://github.com/NightOwlEyes/Linux-RGB-Keyboard-Controller-for-Gigabyte-G5-Laptop.git && \
+cd Linux-RGB-Keyboard-Controller-for-Gigabyte-G5-Laptop && \
+sudo cp led /usr/local/bin/ && \
+sudo cp kbd-backlight-* /etc/systemd/system/ && \
 echo tuxedo_keyboard | sudo tee /etc/modules-load.d/tuxedo.conf
 ```
 
-### 7. Give the script executable permissions<br>
+### 5. Set Permissions<br>
+We need to set the correct permissions and SELinux context so the systemd services can execute the control script.
 ```
+# Make the script executable
 sudo chmod +x /usr/local/bin/led
-```
 
-### 8. Label it safe so SELinux doesn't block the script<br>
-```
+# Set the correct SELinux context
 sudo chcon -t bin_t /usr/local/bin/led
 ```
 
-### 9. Tell the system to "Remember to run this service at startup".<br>
+### 6. Enable and Start the Services.<br>
+This will enable the services to start on boot and start the auto-save timer immediately.
 ```
+# Enable the restore-on-boot service
 sudo systemctl enable kbd-backlight-color.service
-sudo systemctl enable kbd-backlight-autosave.timer
+
+# Enable and start the periodic auto-save timer
+sudo systemctl enable --now kbd-backlight-autosave.timer
 ```
 
-### 10. Reload systemd configuration: After modifying a service file, you should always run this command so that the system is aware of the change and restart the device.<br>
+### 7. Finalize Installation<br>
+Reload the systemd manager to apply all changes and reboot the system.
 ```
 sudo systemctl daemon-reload
 sudo reboot now
 ```
+# Usage
+### Key Combinations
+The native hardware keys should now be active.<br>
+  `Fn` + `/` (num lock) Cycle through basic RGB colors.<br>
+  `Fn` + `*` (num lock) Turn the keyboard light on/off.<br>
+  `Fn` + `-` (num lock) Decrease brightness.<br>
+  `Fn` + `+` (num lock) Increase brightness.<br>
 
-## Now you can use the Key Combination
-  `Fn` + `/` (num lock) to change the basic keyboard RGB color.<br>
-  `Fn` + `*` (num lock) to turn on/off the keyboard light.<br>
-  `Fn` + `-` (num lock) to decrease the keyboard brightness.<br>
-  `Fn` + `+` (num lock) to increase the keyboard brightness.<br>
-
-## Or you can also
+### Terminal Command
+For full control over any color and brightness, use the led command.
 ```bash
 Usage: sudo led <command> [parameters]
 
