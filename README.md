@@ -7,6 +7,25 @@
 >[!IMPORTANT]
 >**Secure Boot must be disabled.** Restart your computer and press `F2` to enter BIOS. Navigate to "Administer Secure Boot" and ensure "Secure Boot Status" is **Disabled**
 
+## Features
+
+*   **Full Backlight Control:** Activates and provides complete control over the RGB keyboard backlight on the Gigabyte G5 laptop, a feature not natively supported on most Linux distributions.
+
+*   **Native `Fn` Key Support:** Restores the functionality of the hardware `Fn` keys for quick, on-the-fly adjustments, just like on Windows.
+    *   `Fn` + `/`: Cycle through 7 preset colors.
+    *   `Fn` + `*`: Toggle the backlight on/off.
+    *   `Fn` + `-`: Decrease brightness.
+    *   `Fn` + `+`: Increase brightness.
+
+*   **Powerful Command-Line Interface (CLI):** Includes a user-friendly `led` command that goes beyond the hardware limitations.
+    *   **Full RGB Color Customization:** Set any of the 16.7 million possible colors using RGB values (e.g., `sudo led rgb 255 100 0` for orange).
+    *   **Fine-grained Brightness Control:** Set brightness to any specific value between 0 and 255 for the perfect intensity.
+    *   **Preset Colors:** Includes simple presets for common colors (`red`, `blue`, `white`, `purple`, etc.).
+
+*   **Persistent State with Auto-Save:** This is the core of the solution. The system automatically remembers your last used color and brightness setting.
+    *   **Works Seamlessly:** Whether you change the color using the `Fn` keys or the `led` command, the state is automatically saved periodically.
+    *   **Restores on Boot:** The saved state is automatically restored every time you start your computer, ensuring your keyboard always looks the way you want it to.
+
 ## Prerequisites
 Before starting, make sure you have installed all the necessary tools for building kernel modules.<br>
 Depending on the linux system, there will be different installation commands: `sudo apt`, `sudo dnf`,...<br>
@@ -37,9 +56,9 @@ sudo dkms install -m tuxedo-keyboard -v ${DRIVER_VERSION}
 ```
 >[!NOTE]
 >You will see few lines after running the command, don't worry and do the next steps.<br>
-><sub>Executing post-transaction command.............(bad exit status: 1)<br>
->Failed command:<br>
->dracut --regenerate-all --force</sub>
+>`Executing post-transaction command......(bad exit status: 1)`<br>
+>`Failed command:`<br>
+>`dracut --regenerate-all --force`
 
 ### 3. Load and Verify the Driver<br>
 Load the module into the kernel and check if the control interface was created.
@@ -93,7 +112,7 @@ Reload the systemd manager to apply all changes and reboot the system.
 sudo systemctl daemon-reload
 sudo reboot now
 ```
-# Usage
+## Usage
 ### Key Combinations
 The native hardware keys should now be active.<br>
   `Fn` + `/` (num lock) Cycle through basic RGB colors.<br>
@@ -103,19 +122,19 @@ The native hardware keys should now be active.<br>
 
 ### Terminal Command
 For full control over any color and brightness, use the led command.
-```bash
-Usage: sudo led <command> [parameters]
 
-Command:
-  on | off          Turn on/off the light.
-  bright <0-255>    Set custom brightness.
-  rgb <r> <g> <b>   Custom RGB color mixing.
-  save              (System) Save current state.
-  restore           (System) Restore saved state.
-  help
+**Usage:** `sudo led` `<command>` `[parameters]`
 
-For example:
-  sudo led rgb 128 128 225
-  sudo led bright 50
-  sudo led off
-```
+| Syntax| Command | Parameters | Description |
+|------|------|---------|-------------|
+| `sudo led` | `on` `off`  |  | Turn on/off the light. |
+| `sudo led` | `bright` | `0` - `255` | Set custom brightness. |
+| `sudo led` | `rgb` | `r` `g` `b` | Custom RGB color mixing. |
+| `sudo led` | `save` |  | Save current state. |
+| `sudo led` | `restore` |  | Restore saved state. |
+| `sudo led` | `help` |  | To help. |
+
+**For example:**<br>
+- `sudo led rgb 128 128 225`<br>
+- `sudo led bright 50`<br>
+- `sudo led off`
