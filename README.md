@@ -20,7 +20,6 @@
 *   **Powerful Command-Line Interface (CLI):** Includes a user-friendly `led` command that goes beyond the hardware limitations.
     *   **Full RGB Color Customization:** Set any of the 16.7 million possible colors using RGB values (e.g., `sudo led rgb 255 100 0` for orange).
     *   **Fine-grained Brightness Control:** Set brightness to any specific value between 0 and 255 for the perfect intensity.
-    *   **Preset Colors:** Includes simple presets for common colors (`red`, `blue`, `white`, `purple`, etc.).
 
 *   **Persistent State with Auto-Save:** This is the core of the solution. The system automatically remembers your last used color and brightness setting.
     *   **Works Seamlessly:** Whether you change the color using the `Fn` keys or the `led` command, the state is automatically saved periodically.
@@ -115,8 +114,8 @@ sudo reboot now
 ## Usage
 ### Key Combinations
 The native hardware keys should now be active.<br>
-  `Fn` + `/` (num lock) Cycle through basic RGB colors.<br>
-  `Fn` + `*` (num lock) Turn the keyboard light on/off.<br>
+  `Fn` + `/` (num lock) Cycle through 7 preset colors.<br>
+  `Fn` + `*` (num lock) Toggle the backlight on/off.<br>
   `Fn` + `-` (num lock) Decrease brightness.<br>
   `Fn` + `+` (num lock) Increase brightness.<br>
 
