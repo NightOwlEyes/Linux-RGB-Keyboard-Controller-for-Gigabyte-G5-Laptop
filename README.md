@@ -54,10 +54,16 @@ sudo cp -R ~/clevo-keyboard /usr/src/tuxedo-keyboard-${DRIVER_VERSION}
 sudo dkms install -m tuxedo-keyboard -v ${DRIVER_VERSION}
 ```
 >[!NOTE]
->You will see few lines after running the command, don't worry and do the next steps.<br>
->`Executing post-transaction command......(bad exit status: 1)`<br>
+>You will see **`bad exit status: 1`**, don't worry it's not serious, do the next step.<br>
+>`Executing post-transaction command......`**`(bad exit status: 1)`**<br>
 >`Failed command:`<br>
 >`dracut --regenerate-all --force`
+>
+>But if you see **`bad exit status: 2`**, it means the kernel does not support it so the next steps cannot be performed, in my case it was kernel version 6.15.x so I switched back to an older kernel.<br>
+>`Building module(s)...`**`(bad exit status: 2)`**<br>
+>`Failed command:`<br>
+>`make -j12 KERNELRELEASE=6.15.10-200.fc42.x86_64 KDIR=/lib/modules/...`<br>
+>`Error! Bad return status for module build on kernel:...`
 
 ### 3. Load and Verify the Driver<br>
 Load the module into the kernel and check if the control interface was created.
